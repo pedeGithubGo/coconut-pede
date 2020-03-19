@@ -2,8 +2,9 @@ package app.beelabs.com.codebase.base;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.security.KeyManagementException;
+import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -13,12 +14,11 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-import okhttp3.Interceptor;
+import app.beelabs.com.codebase.base.request.RequestInterceptor;
 import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 /**
@@ -26,36 +26,48 @@ import okhttp3.logging.HttpLoggingInterceptor;
  */
 
 public class BaseManager {
-
-
-    protected OkHttpClient getHttpClient(boolean allowUntrustedSSL, int timeout) {
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+    protected OkHttpClient getHttpClient(boolean allowUntrustedSSL,
+                                         int timeout,
+                                         boolean enableLoggingHttp,
+                                         final String PedePublicKeyRSA) {
 
         final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         if (allowUntrustedSSL) {
             allowUntrustedSSL(httpClient);
+            try {
+                TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+                trustManagerFactory.init((KeyStore) null);
+                TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+                if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+                    throw new IllegalStateException("Unexpected default trust managers:" + java.util.Arrays.toString(trustManagers));
+                }
+                X509TrustManager trustManager = (X509TrustManager) trustManagers[0];
+                SSLContext sc = SSLContext.getInstance("TLSv1.2");
+                sc.init(null, new TrustManager[]{trustManager}, null);
+                httpClient.sslSocketFactory(new TLS12SocketFactory(sc.getSocketFactory()));
+            } catch (NoSuchAlgorithmException | KeyManagementException | IllegalStateException e) {
+                e.printStackTrace();
+            } catch (KeyStoreException e) {
+                e.printStackTrace();
+            }
         }
+
 
         httpClient.connectTimeout(timeout, TimeUnit.SECONDS);
         httpClient.readTimeout(timeout, TimeUnit.SECONDS);
         httpClient.writeTimeout(timeout, TimeUnit.SECONDS);
 
-        httpClient.addInterceptor(logging);
-        httpClient.addInterceptor(new Interceptor() {
-            @Override
-            public Response intercept(Chain chain) throws IOException {
-                Request original = chain.request();
-                Request request = original.newBuilder()
-                        .header("User-Agent", "base")
-                        .header("Accept", "application/json")
-                        .method(original.method(), original.body())
-                        .build();
+        // interceptor RSA for body encryption
+        httpClient.addInterceptor(new RequestInterceptor(PedePublicKeyRSA));
 
-                return chain.proceed(request);
-            }
-        });
+        // interceptor logging HTTP request
+        if (enableLoggingHttp) {
+            HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+            logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+            httpClient.addInterceptor(logging);
+        }
 
         return httpClient.build();
     }
@@ -138,5 +150,4 @@ public class BaseManager {
         httpClient.hostnameVerifier(hostnameVerifier);
 
     }
-
 }

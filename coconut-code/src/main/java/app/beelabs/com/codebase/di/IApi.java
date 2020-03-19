@@ -10,7 +10,10 @@ import okhttp3.Interceptor;
  */
 
 public interface IApi {
-    Object getApiService(String apiDomain, boolean allowUntrusted, Class<IApiService> clazz, int timeout);
 
-    Object getApiService(Interceptor interceptor, String apiDomain, boolean allowUntrusted, Class clazz, int timeout);
+    Object initApiService(String apiDomain, boolean allowUntrusted, Class<IApiService> clazz, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA);
+
+    Object initApiService(String apiDomain, boolean allowUntrusted, Class<IApiService> clazz, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA, Interceptor interceptor);
+
+
 }

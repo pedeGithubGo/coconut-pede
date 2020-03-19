@@ -15,8 +15,8 @@ public class BaseApi {
     private String apiDomain;
     private static BaseApi baseApi;
 
-    public static BaseApi getInstance(){
-        if(baseApi ==null)
+    public static BaseApi getInstance() {
+        if (baseApi == null)
             baseApi = new BaseApi();
         return baseApi;
     }
@@ -29,13 +29,13 @@ public class BaseApi {
         this.apiDomain = apiDomain;
     }
 
-    public Object setupApi(AppComponent appComponent, Class clazz) {
-        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND);
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp) {
+        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, true, null);
     }
 
-    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout) {
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA) {
         IApi api = appComponent.getApi();
-        return api.getApiService(getApiDomain(), allowUntrusted, clazz, timeout);
+        return api.initApiService(getApiDomain(), allowUntrusted, clazz, timeout, enableLoggingHttp, PedePublicKeyRSA);
     }
 
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, Interceptor interceptor) {
