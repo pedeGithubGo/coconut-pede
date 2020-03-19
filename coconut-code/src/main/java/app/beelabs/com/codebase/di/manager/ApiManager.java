@@ -3,6 +3,7 @@ package app.beelabs.com.codebase.di.manager;
 import app.beelabs.com.codebase.base.BaseManager;
 import app.beelabs.com.codebase.di.IApi;
 import app.beelabs.com.codebase.di.IApiService;
+import okhttp3.Interceptor;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -22,6 +23,21 @@ public class ApiManager extends BaseManager implements IApi {
                     .baseUrl(apiDomain)
                     .addConverterFactory(JacksonConverterFactory.create())
                     .client(getHttpClient(allowUntrusted, timeout))
+                    .build();
+            api = retrofit.create(clazz);
+            this.apiDomain = apiDomain;
+        }
+        return api;
+    }
+
+    @Override
+    public Object getApiService(Interceptor interceptor, String apiDomain, boolean allowUntrusted, Class clazz, int timeout) {
+
+        if (api == null || !this.apiDomain.equals(apiDomain)) {
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(apiDomain)
+                    .addConverterFactory(JacksonConverterFactory.create())
+                    .client(getHttpClient(interceptor, allowUntrusted, timeout))
                     .build();
             api = retrofit.create(clazz);
             this.apiDomain = apiDomain;

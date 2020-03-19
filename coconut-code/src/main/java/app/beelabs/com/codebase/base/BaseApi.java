@@ -4,6 +4,7 @@ package app.beelabs.com.codebase.base;
 import app.beelabs.com.codebase.IConfig;
 import app.beelabs.com.codebase.di.IApi;
 import app.beelabs.com.codebase.di.component.AppComponent;
+import okhttp3.Interceptor;
 
 
 /**
@@ -35,6 +36,11 @@ public class BaseApi {
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout) {
         IApi api = appComponent.getApi();
         return api.getApiService(getApiDomain(), allowUntrusted, clazz, timeout);
+    }
+
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, Interceptor interceptor) {
+        IApi api = appComponent.getApi();
+        return api.getApiService(interceptor, getApiDomain(), allowUntrusted, clazz, timeout);
     }
 }
 

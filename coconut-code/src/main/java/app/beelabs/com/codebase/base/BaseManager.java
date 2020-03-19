@@ -32,7 +32,7 @@ public class BaseManager {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+        final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
 
         if (allowUntrustedSSL) {
             allowUntrustedSSL(httpClient);
@@ -57,6 +57,39 @@ public class BaseManager {
             }
         });
 
+        return httpClient.build();
+    }
+
+
+    protected OkHttpClient getHttpClient(Interceptor customInterceptor, boolean allowUntrustedSSL, int timeout) {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
+        final OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
+
+        if (allowUntrustedSSL) {
+            allowUntrustedSSL(httpClient);
+        }
+
+        httpClient.connectTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.readTimeout(timeout, TimeUnit.SECONDS);
+        httpClient.writeTimeout(timeout, TimeUnit.SECONDS);
+
+        httpClient.addInterceptor(logging);
+        httpClient.addInterceptor(new Interceptor() {
+            @Override
+            public Response intercept(Chain chain) throws IOException {
+                Request original = chain.request();
+                Request request = original.newBuilder()
+                        .header("User-Agent", "base")
+                        .header("Accept", "application/json")
+                        .method(original.method(), original.body())
+                        .build();
+
+                return chain.proceed(request);
+            }
+        });
+        httpClient.addInterceptor(customInterceptor);
         return httpClient.build();
     }
 
