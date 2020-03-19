@@ -33,14 +33,19 @@ public class BaseApi {
         return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, true, null);
     }
 
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, Interceptor interceptor) {
+        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, true, null, interceptor);
+    }
+
+
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA) {
         IApi api = appComponent.getApi();
         return api.initApiService(getApiDomain(), allowUntrusted, clazz, timeout, enableLoggingHttp, PedePublicKeyRSA);
     }
 
-    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, Interceptor interceptor) {
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA, Interceptor interceptor) {
         IApi api = appComponent.getApi();
-        return api.getApiService(interceptor, getApiDomain(), allowUntrusted, clazz, timeout);
+        return api.initApiService(getApiDomain(), allowUntrusted, clazz, timeout, enableLoggingHttp, PedePublicKeyRSA, interceptor);
     }
 }
 

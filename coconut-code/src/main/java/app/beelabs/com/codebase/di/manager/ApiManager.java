@@ -31,13 +31,13 @@ public class ApiManager extends BaseManager implements IApi {
     }
 
     @Override
-    public Object getApiService(Interceptor interceptor, String apiDomain, boolean allowUntrusted, Class clazz, int timeout) {
+    public Object initApiService(String apiDomain, boolean allowUntrusted, Class<IApiService> clazz, int timeout, boolean enableLoggingHttp, String PedePublicKeyRSA, Interceptor interceptor) {
 
         if (api == null || !this.apiDomain.equals(apiDomain)) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(apiDomain)
                     .addConverterFactory(JacksonConverterFactory.create())
-                    .client(getHttpClient(interceptor, allowUntrusted, timeout))
+                    .client(getHttpClient(allowUntrusted, timeout, enableLoggingHttp, PedePublicKeyRSA))
                     .build();
             api = retrofit.create(clazz);
             this.apiDomain = apiDomain;
