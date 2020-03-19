@@ -30,11 +30,11 @@ public class BaseApi {
     }
 
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp) {
-        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, true, null);
+        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, enableLoggingHttp, (String) null);
     }
 
-    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, Interceptor interceptor) {
-        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, true, null, interceptor);
+    public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp, Interceptor interceptor) {
+        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, enableLoggingHttp, null, interceptor);
     }
 
 

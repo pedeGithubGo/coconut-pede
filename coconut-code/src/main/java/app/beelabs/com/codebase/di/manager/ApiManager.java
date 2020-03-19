@@ -37,7 +37,7 @@ public class ApiManager extends BaseManager implements IApi {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(apiDomain)
                     .addConverterFactory(JacksonConverterFactory.create())
-                    .client(getHttpClient(allowUntrusted, timeout, enableLoggingHttp, PedePublicKeyRSA))
+                    .client(getHttpClient(allowUntrusted, timeout, enableLoggingHttp, PedePublicKeyRSA, interceptor))
                     .build();
             api = retrofit.create(clazz);
             this.apiDomain = apiDomain;
