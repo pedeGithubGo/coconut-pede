@@ -1,7 +1,6 @@
 package app.beelabs.com.codebase.base;
 
 
-import app.beelabs.com.codebase.IConfig;
 import app.beelabs.com.codebase.di.IApi;
 import app.beelabs.com.codebase.di.component.AppComponent;
 import okhttp3.Interceptor;
@@ -30,11 +29,11 @@ public class BaseApi {
     }
 
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp) {
-        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, enableLoggingHttp, (String) null);
+        return setupApi(appComponent, clazz, allowUntrusted, timeout, enableLoggingHttp, (String) null);
     }
 
     public Object setupApi(AppComponent appComponent, Class clazz, boolean allowUntrusted, int timeout, boolean enableLoggingHttp, Interceptor interceptor) {
-        return setupApi(appComponent, clazz, false, IConfig.TIMEOUT_SHORT_INSECOND, enableLoggingHttp, null, interceptor);
+        return setupApi(appComponent, clazz, allowUntrusted, timeout, enableLoggingHttp, null, interceptor);
     }
 
 
