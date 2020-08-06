@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
     lintOptions {
         abortOnError false        // true by default
         checkAllWarnings false
@@ -13,7 +13,7 @@ android {
     defaultConfig {
         applicationId "app.beelabs.com.coconut"
         minSdkVersion 19
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
